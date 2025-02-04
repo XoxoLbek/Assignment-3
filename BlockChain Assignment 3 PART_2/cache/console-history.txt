@@ -1,0 +1,14 @@
+await token.transfer(accounts[1].address, ethers.parseUnits("1000", 18));
+console.log(await token.balanceOf(accounts[1].address));
+console.log(await token.balanceOf(accounts[0].address));
+1000
+console.log(await token.balanceOf(accounts[0].addr
+console.log(accounts[0].address); // Это адрес, на который были начислены токены
+accounts = await ethers.getSigners();
+console.log(accounts[0].address); // Это адрес, на который были начислены токены
+console.log(await token.balanceOf("0x3819Cd1a09Ba3eA2BECdf556fbEC38Fe9FB7B4AF")); // Проверить баланс владельца контракта
+console.log(await token.totalSupply()); // Проверить общий запас токенов
+const token = await Token.attach("0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512");
+const Token = await ethers.getContractFactory("UniversityName_GroupNameToken");
+accounts = await ethers.getSigners();
+.help
