@@ -22,18 +22,47 @@ contract UniversityName_GroupNameToken is ERC20 {
 
     // Helper function to convert timestamp to human-readable format (internal)
     function _timestampToString(uint256 timestamp) internal pure returns (string memory) {
-        uint256 secondsPart = timestamp % 60;
-        uint256 minutesPart = (timestamp / 60) % 60;
-        uint256 hoursPart = (timestamp / 3600) % 24;
-        uint256 day = (timestamp / 86400) % 30;
-        uint256 month = (timestamp / 2592000) % 12;
-        uint256 year = timestamp / 31536000;
+    timestamp += 5 * 3600; // (UTC+5)
+    uint256 secondsPart = timestamp % 60;
+    uint256 minutesPart = (timestamp / 60) % 60;
+    uint256 hoursPart = (timestamp / 3600) % 24;
+    
+    // Правильный расчет даты
+    uint256 daysSinceEpoch = timestamp / 86400;
+    uint256 year = 1970;
+    uint256 month;
+    uint256 day;
+    
+    uint16[12] memory monthDays = [uint16(31), uint16(28), uint16(31), uint16(30), uint16(31), uint16(30), uint16(31), uint16(31), uint16(30), uint16(31), uint16(30), uint16(31)];
 
-        return string(abi.encodePacked(
-            uint2str(year), "-", uint2str(month), "-", uint2str(day),
-            " ", uint2str(hoursPart), ":", uint2str(minutesPart), ":", uint2str(secondsPart)
-        ));
+    while (daysSinceEpoch >= (isLeapYear(year) ? 366 : 365)) {
+        daysSinceEpoch -= isLeapYear(year) ? 366 : 365;
+        year++;
     }
+
+    for (uint256 i = 0; i < 12; i++) {
+        uint256 daysInMonth = monthDays[i];
+        if (i == 1 && isLeapYear(year)) { // Февраль високосного года
+            daysInMonth = 29;
+        }
+        if (daysSinceEpoch < daysInMonth) {
+            month = i + 1;
+            day = daysSinceEpoch + 1;
+            break;
+        }
+        daysSinceEpoch -= daysInMonth;
+    }
+
+    return string(abi.encodePacked(
+        uint2str(year), "-", uint2str(month), "-", uint2str(day),
+        " ", uint2str(hoursPart), ":", uint2str(minutesPart), ":", uint2str(secondsPart)
+    ));
+}
+
+function isLeapYear(uint256 year) internal pure returns (bool) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
 
     // Function to retrieve the address of the transaction sender (10 points)
     function getSenderAddress() public view returns (address) {
